@@ -1,24 +1,46 @@
-output "bucket_domain_name" {
-  value       = var.enabled ? join("", aws_s3_bucket.default.*.bucket_domain_name) : ""
-  description = "FQDN of bucket"
+output "alb_name" {
+  description = "The ARN suffix of the ALB"
+  value       = aws_lb.default.name
 }
 
-output "bucket_id" {
-  value       = var.enabled ? join("", aws_s3_bucket.default.*.id) : ""
-  description = "Bucket Name (aka ID)"
+output "alb_arn" {
+  description = "The ARN of the ALB"
+  value       = aws_lb.default.arn
 }
 
-output "bucket_arn" {
-  value       = var.enabled ? join("", aws_s3_bucket.default.*.arn) : ""
-  description = "Bucket ARN"
+output "alb_arn_suffix" {
+  description = "The ARN suffix of the ALB"
+  value       = aws_lb.default.arn_suffix
 }
 
-output "prefix" {
-  value       = var.lifecycle_prefix
-  description = "Prefix configured for lifecycle rules"
+output "alb_dns_name" {
+  description = "DNS name of ALB"
+  value       = aws_lb.default.dns_name
 }
 
-output "enabled" {
-  value       = var.enabled
-  description = "Is module enabled"
+output "alb_zone_id" {
+  description = "The ID of the zone which ALB is provisioned"
+  value       = aws_lb.default.zone_id
+}
+
+output "default_target_group_arn" {
+  description = "The default target group ARN"
+  value       = aws_lb_target_group.default.arn
+}
+
+output "http_listener_arn" {
+  description = "The ARN of the HTTP listener"
+  value       = join("", aws_lb_listener.http.*.arn)
+}
+
+output "https_listener_arn" {
+  description = "The ARN of the HTTPS listener"
+  value       = join("", aws_lb_listener.https.*.arn)
+}
+
+output "listener_arns" {
+  description = "A list of all the listener ARNs"
+  value = compact(
+    concat(aws_lb_listener.http.*.arn, aws_lb_listener.https.*.arn)
+  )
 }

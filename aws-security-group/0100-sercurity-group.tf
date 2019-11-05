@@ -2,6 +2,7 @@
 resource "aws_security_group" "main"{
   count      = var.enabled  ? 1 : 0
   vpc_id     = var.vpc_id
+  name       = "GN-${module.security-group_label.name}"
   dynamic "egress" {
     for_each = var.security_rule_egress
     content {

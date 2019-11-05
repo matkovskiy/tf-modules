@@ -4,9 +4,7 @@ resource "aws_lb" "default" {
   internal           = var.internal
   load_balancer_type = "application"
 
-  security_groups = compact(
-    concat(var.security_group_ids, [aws_security_group.default.id]),
-  )
+  security_groups = var.security_group_ids
 
   subnets                          = var.subnet_ids
   enable_cross_zone_load_balancing = var.cross_zone_load_balancing_enabled
@@ -16,14 +14,14 @@ resource "aws_lb" "default" {
   enable_deletion_protection       = var.deletion_protection_enabled
 
   access_logs {
-    bucket  = module.access_logs.bucket_id
+    bucket  = var.bucket_for_logs_id
     prefix  = var.access_logs_prefix
     enabled = var.access_logs_enabled
   }
 }
 
 module "default_target_group_label" {
-  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.16.0"
+  source     = "git::https://github.com/matkovskiy/tf-modules.git//tf-label?ref=tags/v0.0.3"
   attributes = concat(var.attributes, ["default"])
   delimiter  = var.delimiter
   name       = var.name
@@ -67,7 +65,13 @@ resource "aws_lb_listener" "http" {
 
   default_action {
     target_group_arn = aws_lb_target_group.default.arn
-    type             = "forward"
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
   }
 }
 
