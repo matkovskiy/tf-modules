@@ -61,7 +61,7 @@ variable "security_rule_ingress" {
   # type        = list(map(string))
   default = [
     {
-      cidr_blocks     = ["20.0.0.0/24"]
+      cidr_blocks     = ["10.10.10.10/32"]
       from_port       = 0
       to_port         = 0
       protocol        = "-1"
