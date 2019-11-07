@@ -17,3 +17,4 @@ output "values" {
 output "map" {
   description = "A map of the names and values created"
   value       = "${zipmap(local.nam
+}
