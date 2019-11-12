@@ -1,2 +1,2 @@
 # tf-modules
-modules for Terrafrom
+modules for Terraform
