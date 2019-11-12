@@ -12,13 +12,13 @@ output "log_group_name" {
   description = "Name of log group"
   value       = "${join("", aws_cloudwatch_log_group.default.*.name)}"
 }
-
-output "role_arn" {
-  value       = "${module.role.arn}"
-  description = "ARN of role to assume"
-}
-
-output "role_name" {
-  value       = "${module.role.name}"
-  description = "Name of role to assume"
-}
+# 
+# output "role_arn" {
+#   value       = "${module.role.arn}"
+#   description = "ARN of role to assume"
+# }
+#
+# output "role_name" {
+#   value       = "${module.role.name}"
+#   description = "Name of role to assume"
+# }
