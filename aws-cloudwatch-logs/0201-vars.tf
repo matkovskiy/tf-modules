@@ -8,6 +8,11 @@ variable "name" {
   description = "Name  (e.g. `bastion` or `db`)"
 }
 
+variable "log_group_name" {
+  default     = ""
+  description = "log_group_name"
+}
+
 variable "namespace" {
   description = "Namespace (e.g. `cp` or `cloudposse`)"
   type        = "string"
