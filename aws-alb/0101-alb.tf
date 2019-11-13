@@ -20,16 +20,6 @@ resource "aws_lb" "default" {
   }
 }
 
-module "default_target_group_label" {
-  source     = "git::https://github.com/matkovskiy/tf-modules.git//tf-label?ref=tags/v0.0.3"
-  attributes = concat(var.attributes, ["default"])
-  delimiter  = var.delimiter
-  name       = var.name
-  namespace  = var.namespace
-  stage      = var.stage
-  tags       = var.tags
-}
-
 resource "aws_lb_target_group" "default" {
   name                 = var.target_group_name == "" ? module.default_target_group_label.id : var.target_group_name
   port                 = var.target_group_port
