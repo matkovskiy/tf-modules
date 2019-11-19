@@ -6,11 +6,9 @@ data "aws_lb_target_group" "default" {
   arn = local.target_group_arn
 }
 
-
-
 resource "aws_lb_target_group" "default" {
   count       = var.default_target_group_enabled ? 1 : 0
-  name        = module.default_label.id
+  name        = var.target_group_name == "" ? module.default_label.id: var.target_group_name
   port        = var.port
   protocol    = var.protocol
   slow_start  = var.slow_start

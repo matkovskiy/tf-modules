@@ -39,6 +39,12 @@ variable "default_target_group_enabled" {
   description = "Enable/disable creation of the default target group"
 }
 
+variable "target_group_name" {
+  type        = string
+  default     = ""
+  description = "The name for the default target group, uses a module label name if left empty"
+}
+
 variable "target_group_arn" {
   type        = string
   default     = ""
