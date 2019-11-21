@@ -7,8 +7,8 @@ locals {
 
 resource "aws_ecr_repository" "default" {
   count = var.enabled ? 1 : 0
-  name  = var.use_fullname ? module.label.id : module.label.name
-
+  #name  = var.use_fullname ? module.label.id : module.label.name
+  name  = var.repositorie-name
   image_scanning_configuration {
     scan_on_push = var.scan_images_on_push
   }

@@ -15,6 +15,10 @@ variable "name" {
   description = "The Name of the application or solution  (e.g. `bastion` or `portal`)"
 }
 
+variable "repositorie-name" {
+  type        = string
+  description = "The Name of ERC Repositorie"
+}
 variable "delimiter" {
   type        = string
   default     = "-"
