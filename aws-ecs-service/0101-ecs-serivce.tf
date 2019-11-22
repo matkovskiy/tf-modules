@@ -24,5 +24,5 @@ resource "aws_ecs_service" "main" {
   #   container_name   = var.load_balancer_enable == true ? var.container_name : ""
   #   container_port   = var.load_balancer_enable == true ? var.container_port : 0
   # }
-  # health_check_grace_period_seconds = var.load_balancer_enable == true ? var.health_check_grace_period_seconds : 0
+  health_check_grace_period_seconds = var.load_balancer_enable == true ? var.health_check_grace_period_seconds : 0
 }
