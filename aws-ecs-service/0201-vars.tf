@@ -18,7 +18,7 @@ variable "name" {
 variable "load_balancer_enable" {
   type        = bool
   description = "If load_balancer shoud be deploy"
-  default     = true
+  default     = false
 }
 
 variable "enabled" {
