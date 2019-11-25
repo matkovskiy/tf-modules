@@ -15,6 +15,12 @@ variable "name" {
   description = "Name  (e.g. `bastion` or `db`)"
 }
 
+variable "load_balancer_enable" {
+  type        = bool
+  description = "If load_balancer shoud be deploy"
+  default     = false
+}
+
 variable "enabled" {
   type        = bool
   description = "If it should be enabled"
