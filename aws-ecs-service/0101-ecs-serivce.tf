@@ -8,7 +8,6 @@ resource "aws_ecs_service" "main" {
   iam_role                           = var.iam_role != "" ? var.iam_role : null
 
 
-
   dynamic "load_balancer" {
     for_each = var.ecs_load_balancers
     content {
@@ -17,12 +16,5 @@ resource "aws_ecs_service" "main" {
       target_group_arn = lookup(load_balancer.value, "target_group_arn", null)
     }
   }
-
-
-  # load_balancer {
-  #   target_group_arn = var.load_balancer_enable == true ? var.target_group_arn : ""
-  #   container_name   = var.load_balancer_enable == true ? var.container_name : ""
-  #   container_port   = var.load_balancer_enable == true ? var.container_port : 0
-  # }
   health_check_grace_period_seconds = var.load_balancer_enable == true ? var.health_check_grace_period_seconds : 0
 }
