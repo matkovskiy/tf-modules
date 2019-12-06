@@ -1,8 +1,3 @@
-output "public_subnet_ids" {
-  value = aws_subnet.public.*.id
-  description = "Map of AZ names to subnet IDs"
-}
-
 output "az_subnet_ids" {
   value = zipmap(
     var.availability_zones,

@@ -1,8 +1,9 @@
 output "public_ip" {
   description = "Public IP of instance (or EIP)"
-  value = coalesce(
-    join("", aws_eip.default.*.public_ip),
-    join("", aws_instance.default.*.public_ip)
+  value = compact(
+    concat(
+      [var.associate_public_ip_address == true ? coalesce( join("", aws_eip.default.*.public_ip), join("", aws_instance.default.*.public_ip)) : ""]
+    )
   )
 }
 
@@ -29,6 +30,16 @@ output "id" {
 output "ssh_key_pair" {
   description = "Name of the SSH key pair provisioned on the instance"
   value       = var.ssh_key_pair
+}
+
+output "security_group_ids" {
+  description = "IDs on the AWS Security Groups associated with the instance"
+  value = compact(
+    concat(
+      [var.create_default_security_group == true ? join("", aws_security_group.default.*.id) : ""],
+      var.security_groups
+    )
+  )
 }
 
 output "role" {

@@ -63,7 +63,6 @@ data "aws_ami" "info" {
   owners = [local.ami_owner]
 }
 
-
 resource "aws_iam_instance_profile" "default" {
   count = local.instance_count
   name  = module.label.id
@@ -95,7 +94,14 @@ resource "aws_instance" "default" {
   ipv6_address_count          = var.ipv6_address_count
   ipv6_addresses              = var.ipv6_addresses
 
-  vpc_security_group_ids = var.security_groups
+  vpc_security_group_ids = compact(
+    concat(
+      [
+        var.create_default_security_group ? join("", aws_security_group.default.*.id) : "",
+      ],
+      var.security_groups
+    )
+  )
 
   root_block_device {
     volume_type           = local.root_volume_type
