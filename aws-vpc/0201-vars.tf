@@ -11,7 +11,7 @@ variable "enable_dns_hostnames" {
 }
 
 variable "vpc_tags" {
-  type = "map"
+  type = map
   default = {
   }
 }
@@ -22,7 +22,7 @@ variable "create_igw" {
 }
 
 variable "igw_tags" {
-  type = "map"
+  type = map
   default = {
   }
 }
