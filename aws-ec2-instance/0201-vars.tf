@@ -28,12 +28,12 @@ variable "vpc_id" {
 
 variable "security_groups" {
   description = "List of Security Group IDs allowed to connect to the instance"
-  type        = "list"
+  type        = list
   default     = []
 }
 
 variable "allowed_ports" {
-  type        = "list"
+  type        = list
   description = "List of allowed ingress ports"
   default     = []
 }
@@ -61,13 +61,13 @@ variable "delimiter" {
 
 variable "attributes" {
   description = "Additional attributes (e.g. `1`)"
-  type        = "list"
+  type        = list
   default     = []
 }
 
 variable "tags" {
   description = "Additional tags"
-  type        = "map"
+  type        = map
   default     = {}
 }
 
@@ -122,7 +122,7 @@ variable "ipv6_address_count" {
 }
 
 variable "ipv6_addresses" {
-  type        = "list"
+  type        = list
   description = "List of IPv6 addresses from the range of the subnet to associate with the primary network interface"
   default     = []
 }
@@ -143,7 +143,7 @@ variable "root_iops" {
 }
 
 variable "ebs_device_name" {
-  type        = "list"
+  type        = list
   description = "Name of the EBS device to mount"
   default     = ["/dev/xvdb", "/dev/xvdc", "/dev/xvdd", "/dev/xvde", "/dev/xvdf", "/dev/xvdg", "/dev/xvdh", "/dev/xvdi", "/dev/xvdj", "/dev/xvdk", "/dev/xvdl", "/dev/xvdm", "/dev/xvdn", "/dev/xvdo", "/dev/xvdp", "/dev/xvdq", "/dev/xvdr", "/dev/xvds", "/dev/xvdt", "/dev/xvdu", "/dev/xvdv", "/dev/xvdw", "/dev/xvdx", "/dev/xvdy", "/dev/xvdz"]
 }

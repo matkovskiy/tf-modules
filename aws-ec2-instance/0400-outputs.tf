@@ -2,7 +2,7 @@ output "public_ip" {
   description = "Public IP of instance (or EIP)"
   value = compact(
     concat(
-      [var.associate_public_ip_address == true ? coalesce( join("", aws_eip.default.*.public_ip), join("", aws_instance.default.*.public_ip)) : ""]
+      [var.associate_public_ip_address == true ? coalesce(join("", aws_eip.default.*.public_ip), join("", aws_instance.default.*.public_ip)) : ""]
     )
   )
 }
