@@ -56,6 +56,12 @@ variable "unauthenticated_listener_arns" {
   default     = []
   description = "A list of unauthenticated ALB listener ARNs to attach ALB listener rules to"
 }
+variable "source_ip_list" {
+  type        = list(string)
+  default     = []
+  description = "A list of soruce ip which allow to connect"
+}
+
 
 variable "unauthenticated_listener_arns_count" {
   type        = number

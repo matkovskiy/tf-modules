@@ -48,8 +48,9 @@ resource "aws_lb_listener_rule" "unauthenticated_paths" {
   }
 
   condition {
-    field  = "path-pattern"
-    values = var.unauthenticated_paths
+    path_pattern {
+      values = var.unauthenticated_paths
+    }
   }
 }
 
@@ -77,8 +78,9 @@ resource "aws_lb_listener_rule" "authenticated_paths_oidc" {
   }
 
   condition {
-    field  = "path-pattern"
-    values = var.authenticated_paths
+    path_pattern {
+      values = var.authenticated_paths
+    }
   }
 }
 
@@ -103,8 +105,9 @@ resource "aws_lb_listener_rule" "authenticated_paths_cognito" {
   }
 
   condition {
-    field  = "path-pattern"
-    values = var.authenticated_paths
+    path_pattern {
+      values = var.authenticated_paths
+    }
   }
 }
 
@@ -119,8 +122,9 @@ resource "aws_lb_listener_rule" "unauthenticated_hosts" {
   }
 
   condition {
-    field  = "host-header"
-    values = var.unauthenticated_hosts
+    host_header {
+      values = var.unauthenticated_hosts
+    }
   }
 }
 
@@ -148,8 +152,9 @@ resource "aws_lb_listener_rule" "authenticated_hosts_oidc" {
   }
 
   condition {
-    field  = "host-header"
-    values = var.authenticated_hosts
+    host_header {
+      values = var.authenticated_hosts
+    }
   }
 }
 
@@ -174,13 +179,37 @@ resource "aws_lb_listener_rule" "authenticated_hosts_cognito" {
   }
 
   condition {
-    field  = "host-header"
-    values = var.authenticated_hosts
+    host_header {
+      values = var.authenticated_hosts
+    }
   }
 }
 
 resource "aws_lb_listener_rule" "unauthenticated_hosts_paths" {
-  count        = length(var.unauthenticated_paths) > 0 && length(var.unauthenticated_hosts) > 0 ? var.unauthenticated_listener_arns_count : 0
+  count        = length(var.unauthenticated_paths) > 0 && length(var.unauthenticated_hosts) > 0  && length(var.source_ip_list) == 0 ? var.unauthenticated_listener_arns_count : 0
+  listener_arn = var.unauthenticated_listener_arns[count.index]
+  priority     = var.unauthenticated_priority + count.index
+
+  action {
+    type             = "forward"
+    target_group_arn = local.target_group_arn
+  }
+  condition {
+    host_header {
+      values = var.unauthenticated_hosts
+    }
+  }
+
+  condition {
+    path_pattern {
+      values = var.unauthenticated_paths
+    }
+  }
+}
+
+
+resource "aws_lb_listener_rule" "unauthenticated_hosts_paths_sourceip_list" {
+  count        = length(var.unauthenticated_paths) > 0 && length(var.unauthenticated_hosts) > 0 && length(var.source_ip_list) > 0 ? var.unauthenticated_listener_arns_count : 0
   listener_arn = var.unauthenticated_listener_arns[count.index]
   priority     = var.unauthenticated_priority + count.index
 
@@ -190,13 +219,20 @@ resource "aws_lb_listener_rule" "unauthenticated_hosts_paths" {
   }
 
   condition {
-    field  = "host-header"
-    values = var.unauthenticated_hosts
+    host_header {
+      values = var.unauthenticated_hosts
+    }
   }
 
   condition {
-    field  = "path-pattern"
-    values = var.unauthenticated_paths
+    path_pattern {
+      values = var.unauthenticated_paths
+    }
+  }
+    condition {
+      source_ip {
+        values = var.source_ip_list
+      }
   }
 }
 
@@ -224,13 +260,15 @@ resource "aws_lb_listener_rule" "authenticated_hosts_paths_oidc" {
   }
 
   condition {
-    field  = "host-header"
-    values = var.authenticated_hosts
+    host_header {
+      values = var.authenticated_hosts
+    }
   }
 
   condition {
-    field  = "path-pattern"
-    values = var.authenticated_paths
+    path_pattern {
+      values = var.authenticated_paths
+    }
   }
 }
 
@@ -255,12 +293,14 @@ resource "aws_lb_listener_rule" "authenticated_hosts_paths_cognito" {
   }
 
   condition {
-    field  = "host-header"
-    values = var.authenticated_hosts
+    host_header {
+      values = var.authenticated_hosts
+    }
   }
 
   condition {
-    field  = "path-pattern"
-    values = var.authenticated_paths
+    path_pattern {
+      values = var.authenticated_paths
+    }
   }
 }
