@@ -91,7 +91,6 @@ variable "health_check_grace_period_seconds" {
   default     = 20
 }
 
-
 variable "ecs_load_balancers" {
   type = list(object({
     container_name   = string
@@ -99,5 +98,16 @@ variable "ecs_load_balancers" {
     target_group_arn = string
   }))
   description = "A list of load balancer config objects for the ECS service; see `load_balancer` docs https://www.terraform.io/docs/providers/aws/r/ecs_service.html"
+  default     = []
+}
+
+variable "ecs_service_registries" {
+  type = list(object({
+    registry_arn   = string
+    # port           = number
+    container_port = number
+    container_name = string
+  }))
+  description = "The service discovery registries for the service. The maximum number of service_registries blocks is 1"
   default     = []
 }

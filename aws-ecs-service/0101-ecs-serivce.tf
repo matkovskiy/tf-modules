@@ -7,6 +7,17 @@ resource "aws_ecs_service" "main" {
   deployment_maximum_percent         = var.deployment_maximum_percent
   iam_role                           = var.iam_role != "" ? var.iam_role : null
 
+  dynamic "service_registries" {
+    for_each = var.ecs_service_registries
+    content {
+      registry_arn    = service_registries.value.registry_arn
+      # port            = lookup(service_registries.value, "port", null)
+      container_port  = lookup(service_registries.value, "container_port", null)
+      container_name  = lookup(service_registries.value, "container_name", null)
+    }
+  }
+
+
 
   dynamic "load_balancer" {
     for_each = var.ecs_load_balancers
