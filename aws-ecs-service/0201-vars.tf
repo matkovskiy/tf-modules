@@ -111,3 +111,14 @@ variable "ecs_service_registries" {
   description = "The service discovery registries for the service. The maximum number of service_registries blocks is 1"
   default     = []
 }
+
+
+variable "network_configuration" {
+  type = list(object({
+    subnets   = string
+    security_groups = string
+    assign_public_ip = bool
+  }))
+  description = "Task Networking with the awsvpc Network Mode"
+  default     = []
+}

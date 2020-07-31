@@ -27,5 +27,17 @@ resource "aws_ecs_service" "main" {
       target_group_arn = lookup(load_balancer.value, "target_group_arn", null)
     }
   }
+
+  dynamic "network_configuration" {
+    for_each = var.network_configuration
+    content {
+      subnets     = [lookup(network_configuration.value, "subnets", null)]
+      security_groups  = [lookup(network_configuration.value, "security_groups", null)]
+      assign_public_ip   = lookup(network_configuration.value, "assign_public_ip", null)
+    }
+  }
+
+
+
   health_check_grace_period_seconds = var.load_balancer_enable == true ? var.health_check_grace_period_seconds : 0
 }
