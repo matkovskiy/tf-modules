@@ -1,56 +1,3 @@
-variable "namespace" {
-  type        = string
-  default     = ""
-  description = "Namespace, which could be your organization name or abbreviation, e.g. 'eg' or 'cp'"
-}
-
-variable "environment" {
-  type        = string
-  default     = ""
-  description = "Environment, e.g. 'prod', 'staging', 'dev', 'pre-prod', 'UAT'"
-}
-
-variable "stage" {
-  type        = string
-  default     = ""
-  description = "Stage, e.g. 'prod', 'staging', 'dev', OR 'source', 'build', 'test', 'deploy', 'release'"
-}
-
-variable "name" {
-  type        = string
-  default     = ""
-  description = "Solution name, e.g. 'app' or 'jenkins'"
-}
-
-variable "bucket_name" {
-  type        = string
-  default     = ""
-  description = "Bucket name"
-}
-variable "enabled" {
-  type        = bool
-  default     = true
-  description = "Set to false to prevent the module from creating any resources"
-}
-
-variable "delimiter" {
-  type        = string
-  default     = "-"
-  description = "Delimiter to be used between `namespace`, `environment`, `stage`, `name` and `attributes`"
-}
-
-variable "attributes" {
-  type        = list(string)
-  default     = []
-  description = "Additional attributes (e.g. `1`)"
-}
-
-variable "tags" {
-  type        = map(string)
-  default     = {}
-  description = "Additional tags (e.g. `map('BusinessUnit','XYZ')`"
-}
-
 variable "acl" {
   type        = string
   default     = "private"
@@ -75,12 +22,6 @@ variable "policy" {
   description = "A valid bucket policy JSON document. Note that if the policy document is not specific enough (but still valid), Terraform may view the policy as constantly changing in a terraform plan. In this case, please make sure you use the verbose/specific version of the policy"
 }
 
-variable "region" {
-  type        = string
-  default     = ""
-  description = "If specified, the AWS region this bucket should reside in. Otherwise, the region used by the callee"
-}
-
 variable "force_destroy" {
   type        = bool
   default     = false
@@ -91,6 +32,15 @@ variable "versioning_enabled" {
   type        = bool
   default     = false
   description = "A state of versioning. Versioning is a means of keeping multiple variants of an object in the same bucket"
+}
+
+variable "logging" {
+  type = object({
+    bucket_name = string
+    prefix      = string
+  })
+  default     = null
+  description = "Bucket access logging configuration."
 }
 
 variable "sse_algorithm" {
@@ -224,4 +174,46 @@ variable "restrict_public_buckets" {
   type        = bool
   default     = true
   description = "Set to `false` to disable the restricting of making the bucket public"
+}
+
+variable "s3_replication_enabled" {
+  type        = bool
+  default     = false
+  description = "Set this to true and specify `s3_replica_bucket_arn` to enable replication. `versioning_enabled` must also be `true`."
+}
+
+variable "s3_replica_bucket_arn" {
+  type        = string
+  default     = ""
+  description = "The ARN of the S3 replica bucket (destination)"
+}
+
+variable "replication_rules" {
+  # type = list(object({
+  #   id          = string
+  #   priority    = number
+  #   prefix      = string
+  #   status      = string
+  #   destination = object({
+  #     storage_class              = string
+  #     replica_kms_key_id         = string
+  #     access_control_translation = object({
+  #       owner = string
+  #     })
+  #     account_id                 = string
+  #   })
+  #   source_selection_criteria = object({
+  #     sse_kms_encrypted_objects = object({
+  #       enabled = bool
+  #     })
+  #   })
+  #   filter = object({
+  #     prefix = string
+  #     tags = map(string)
+  #   })
+  # }))
+
+  type        = list(any)
+  default     = null
+  description = "Specifies the replication rules if S3 bucket replication is enabled"
 }
