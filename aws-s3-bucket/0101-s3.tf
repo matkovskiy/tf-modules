@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "default" {
   count         = module.this.enabled ? 1 : 0
-  bucket        = module.this.id
+  bucket        = length(var.bucket_custom_name) > 0 ? var.bucket_custom_name : module.this.id
   acl           = try(length(var.grants), 0) == 0 ? var.acl : null
   force_destroy = var.force_destroy
   policy        = var.policy

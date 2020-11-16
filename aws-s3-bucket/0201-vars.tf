@@ -16,6 +16,13 @@ variable "grants" {
   description = "An ACL policy grant. Conflicts with `acl`. Set `acl` to `null` to use this."
 }
 
+variable "bucket_custom_name" {
+  type        = string
+  default     = ""
+  description = "The custom name for Bucket"
+}
+
+
 variable "policy" {
   type        = string
   default     = ""
