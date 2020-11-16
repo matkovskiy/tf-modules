@@ -1,44 +1,3 @@
-#
-# ONLY EDIT THIS FILE IN github.com/cloudposse/terraform-null-label
-# All other instances of this file should be a copy of that one
-#
-#
-# Copy this file from https://github.com/cloudposse/terraform-null-label/blob/master/exports/context.tf
-# and then place it in your Terraform module to automatically get
-# Cloud Posse's standard configuration inputs suitable for passing
-# to Cloud Posse modules.
-#
-# Modules should access the whole context as `module.this.context`
-# to get the input variables with nulls for defaults,
-# for example `context = module.this.context`,
-# and access individual variables as `module.this.<var>`,
-# with final values filled in.
-#
-# For example, when using defaults, `module.this.context.delimiter`
-# will be null, and `module.this.delimiter` will be `-` (hyphen).
-#
-
-module "this" {
-  source = "git::https://github.com/matkovskiy/tf-modules.git//tf-null-label?ref=tags/0.0.19"
-
-  enabled             = var.enabled
-  namespace           = var.namespace
-  environment         = var.environment
-  stage               = var.stage
-  name                = var.name
-  delimiter           = var.delimiter
-  attributes          = var.attributes
-  tags                = var.tags
-  additional_tag_map  = var.additional_tag_map
-  label_order         = var.label_order
-  regex_replace_chars = var.regex_replace_chars
-  id_length_limit     = var.id_length_limit
-
-  context = var.context
-}
-
-# Copy contents of cloudposse/terraform-null-label/variables.tf here
-
 variable "context" {
   type = object({
     enabled             = bool
@@ -163,5 +122,3 @@ variable "id_length_limit" {
     Does not affect `id_full`.
   EOT
 }
-
-#### End of copy of cloudposse/terraform-null-label/variables.tf
