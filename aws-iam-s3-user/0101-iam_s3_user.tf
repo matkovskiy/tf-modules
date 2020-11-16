@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "default" {
 }
 
 module "s3_user" {
-  source        = "git::https://github.com/matkovskiy/tf-modules.git//aws-iam-system-user?ref=feature/new-s3-bucket"
+  source        = "git::https://github.com/matkovskiy/tf-modules.git//aws-iam-system-user?ref=tags/0.0.18"
   force_destroy = var.force_destroy
   path          = var.path
 
