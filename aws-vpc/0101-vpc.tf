@@ -6,9 +6,8 @@ locals {
   additional_cidr_blocks                          = local.additional_cidr_blocks_defined ? var.additional_cidr_blocks : []
 }
 
-
 module "label" {
-  source  = "git::https://github.com/matkovskiy/tf-modules.git//aws-null-label?ref=feature/aws-null-label"
+  source = "git::https://github.com/matkovskiy/tf-modules.git//aws-null-label?ref=tags/0.0.24"
   context = module.this.context
 }
 
