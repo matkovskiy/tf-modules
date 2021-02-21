@@ -121,7 +121,7 @@ resource "aws_dynamodb_table" "default" {
 }
 
 module "dynamodb_autoscaler" {
-  source                       = "/Users/amatkovskiy/Work/amatkovskiy/tf-modules/aws-dynamodb-autoscaler/"
+  source = "git::https://github.com/matkovskiy/tf-modules.git//aws-dynamodb-autoscaler?ref=tags/0.0.25"
   enabled                      = var.enabled && var.enable_autoscaler && var.billing_mode == "PROVISIONED"
   namespace                    = var.namespace
   stage                        = var.stage
