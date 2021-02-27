@@ -1,6 +1,6 @@
 module "role" {
   
-  source  = "git::https://github.com/matkovskiy/tf-modules.git//aws-iam-role?ref=tags/0.0.28"
+  source  = "git::https://github.com/matkovskiy/tf-modules.git//aws-iam-role?ref=tags/0.0.29"
 
   
   attributes = compact(concat(module.this.attributes, list("log"), list("group")))
