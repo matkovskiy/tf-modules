@@ -13,7 +13,7 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 module "aggregated_assume_policy" {
-  source           = "git::https://github.com/matkovskiy/tf-modules.git//aws-iam-policy-document-aggregator?ref=tags/0.0.29"
+  source           = "git::https://github.com/matkovskiy/tf-modules.git//aws-iam-policy-document-aggregatorref=tags/0.0.30"
   
   source_documents = data.aws_iam_policy_document.assume_role.*.json
 }
@@ -28,7 +28,7 @@ resource "aws_iam_role" "default" {
 }
 
 module "aggregated_policy" {
-  source           = "git:github.com/matkovskiy/tf-modules.git//aws-iam-policy-document-aggregator?ref=tags/0.0.29"
+  source           = "git::https://github.com/matkovskiy/tf-modules.git//aws-iam-policy-document-aggregatorref=tags/0.0.30"
   source_documents = var.policy_documents
 }
 
