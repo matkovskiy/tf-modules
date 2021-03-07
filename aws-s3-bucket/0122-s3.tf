@@ -176,7 +176,7 @@ resource "aws_s3_bucket" "default" {
 }
 
 module "s3_user" {
-  source  = "git::https://github.com/matkovskiy/tf-modules.git/aws-iam-s3-user/?ref=tags/0.0.28"
+  source  = "git::https://github.com/matkovskiy/tf-modules.git//aws-iam-s3-user?ref=tags/0.0.34"
 
 
   enabled      = module.this.enabled && var.user_enabled ? true : false
