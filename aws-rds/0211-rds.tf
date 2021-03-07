@@ -159,7 +159,7 @@ resource "aws_security_group_rule" "egress" {
 }
 
 module "dns_host_name" {
-  source   = "git::https://github.com/matkovskiy/tf-modules.git/aws-route53-cluster-hostname/?ref=tags/0.0.28"
+  source   = "git::https://github.com/matkovskiy/tf-modules.git//aws-route53-cluster-hostname/?ref=tags/0.0.28"
   enabled  = length(var.dns_zone_id) > 0 && module.this.enabled
   dns_name = var.host_name
   zone_id  = var.dns_zone_id

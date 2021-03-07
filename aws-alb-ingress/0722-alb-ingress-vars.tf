@@ -1,48 +1,7 @@
-variable "namespace" {
-  type        = string
-  description = "Namespace (e.g. `eg` or `cp`)"
-  default     = ""
-}
-
-variable "stage" {
-  type        = string
-  description = "Stage (e.g. `prod`, `dev`, `staging`)"
-  default     = ""
-}
-
-variable "name" {
-  type        = string
-  description = "Name of the application"
-}
-
-variable "delimiter" {
-  type        = string
-  default     = "-"
-  description = "Delimiter between `namespace`, `stage`, `name` and `attributes`"
-}
-
-variable "attributes" {
-  type        = list(string)
-  description = "Additional attributes (_e.g._ \"1\")"
-  default     = []
-}
-
-variable "tags" {
-  type        = map(string)
-  description = "Additional tags (_e.g._ { BusinessUnit : ABC })"
-  default     = {}
-}
-
 variable "default_target_group_enabled" {
   type        = bool
   default     = true
   description = "Enable/disable creation of the default target group"
-}
-
-variable "target_group_name" {
-  type        = string
-  default     = ""
-  description = "The name for the default target group, uses a module label name if left empty"
 }
 
 variable "target_group_arn" {
@@ -56,17 +15,14 @@ variable "unauthenticated_listener_arns" {
   default     = []
   description = "A list of unauthenticated ALB listener ARNs to attach ALB listener rules to"
 }
-variable "source_ip_list" {
-  type        = list(string)
+
+variable "listener_http_header_conditions" {
+  type = list(object({
+    name  = string
+    value = list(string)
+  }))
   default     = []
-  description = "A list of soruce ip which allow to connect"
-}
-
-
-variable "unauthenticated_listener_arns_count" {
-  type        = number
-  default     = 0
-  description = "The number of unauthenticated ARNs in `unauthenticated_listener_arns`. This is necessary to work around a limitation in Terraform where counts cannot be computed"
+  description = "A list of http header conditions to apply to the listener."
 }
 
 variable "authenticated_listener_arns" {
@@ -75,16 +31,16 @@ variable "authenticated_listener_arns" {
   description = "A list of authenticated ALB listener ARNs to attach ALB listener rules to"
 }
 
-variable "authenticated_listener_arns_count" {
-  type        = number
-  default     = 0
-  description = "The number of authenticated ARNs in `authenticated_listener_arns`. This is necessary to work around a limitation in Terraform where counts cannot be computed"
-}
-
 variable "deregistration_delay" {
   type        = number
   default     = 15
   description = "The amount of time to wait in seconds while deregistering target"
+}
+
+variable "load_balancing_algorithm_type" {
+  type        = string
+  default     = "round_robin"
+  description = "Determines how the load balancer selects targets when routing requests. Only applicable for Application Load Balancer Target Groups. The value is round_robin or least_outstanding_requests. The default is round_robin."
 }
 
 variable "health_check_enabled" {
@@ -143,13 +99,13 @@ variable "health_check_matcher" {
 
 variable "unauthenticated_priority" {
   type        = number
-  default     = 100
+  default     = null
   description = "The priority for the rules without authentication, between 1 and 50000 (1 being highest priority). Must be different from `authenticated_priority` since a listener can't have multiple rules with the same priority"
 }
 
 variable "authenticated_priority" {
   type        = number
-  default     = 300
+  default     = null
   description = "The priority for the rules with authentication, between 1 and 50000 (1 being highest priority). Must be different from `unauthenticated_priority` since a listener can't have multiple rules with the same priority"
 }
 
@@ -224,6 +180,12 @@ variable "authentication_cognito_user_pool_domain" {
   default     = ""
 }
 
+variable "authentication_cognito_scope" {
+  type        = string
+  description = "Cognito scope, which should be a space separated string of requested scopes (see https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims)"
+  default     = null
+}
+
 variable "authentication_oidc_client_id" {
   type        = string
   description = "OIDC Client ID"
@@ -258,6 +220,12 @@ variable "authentication_oidc_user_info_endpoint" {
   type        = string
   description = "OIDC User Info Endpoint"
   default     = ""
+}
+
+variable "authentication_oidc_scope" {
+  type        = string
+  description = "OIDC scope, which should be a space separated string of requested scopes (see https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims, and https://developers.google.com/identity/protocols/oauth2/openid-connect#scope-param for an example set of scopes when using Google as the IdP)"
+  default     = null
 }
 
 variable "slow_start" {
