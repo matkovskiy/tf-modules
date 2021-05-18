@@ -41,7 +41,7 @@ resource "aws_route_table" "private" {
 resource "aws_route" "private" {
   count                  = local.private_count
   route_table_id         = aws_route_table.private.*.id[count.index]
-  network_interface_id   = var.eni_id
+  # network_interface_id   = var.eni_id
   nat_gateway_id         = var.ngw_id
   destination_cidr_block = "0.0.0.0/0"
 }
