@@ -11,15 +11,15 @@ resource "aws_launch_template" "default" {
       virtual_name = lookup(block_device_mappings.value, "virtual_name", null)
 
       dynamic "ebs" {
-        for_each = flatten(list(lookup(block_device_mappings.value, "ebs", [])))
+        for_each = lookup(block_device_mappings.value, "ebs", null) == null ? [] : ["ebs"]
         content {
-          delete_on_termination = lookup(ebs.value, "delete_on_termination", null)
-          encrypted             = lookup(ebs.value, "encrypted", null)
-          iops                  = lookup(ebs.value, "iops", null)
-          kms_key_id            = lookup(ebs.value, "kms_key_id", null)
-          snapshot_id           = lookup(ebs.value, "snapshot_id", null)
-          volume_size           = lookup(ebs.value, "volume_size", null)
-          volume_type           = lookup(ebs.value, "volume_type", null)
+          delete_on_termination = lookup(block_device_mappings.value.ebs, "delete_on_termination", null)
+          encrypted             = lookup(block_device_mappings.value.ebs, "encrypted", null)
+          iops                  = lookup(block_device_mappings.value.ebs, "iops", null)
+          kms_key_id            = lookup(block_device_mappings.value.ebs, "kms_key_id", null)
+          snapshot_id           = lookup(block_device_mappings.value.ebs, "snapshot_id", null)
+          volume_size           = lookup(block_device_mappings.value.ebs, "volume_size", null)
+          volume_type           = lookup(block_device_mappings.value.ebs, "volume_type", null)
         }
       }
     }
@@ -97,14 +97,19 @@ resource "aws_launch_template" "default" {
     security_groups             = var.security_group_ids
   }
 
-  tag_specifications {
-    resource_type = "volume"
-    tags          = module.this.tags
+  metadata_options {
+    http_endpoint               = (var.metadata_http_endpoint_enabled) ? "enabled" : "disabled"
+    http_put_response_hop_limit = var.metadata_http_put_response_hop_limit
+    http_tokens                 = (var.metadata_http_tokens_required) ? "required" : "optional"
   }
 
-  tag_specifications {
-    resource_type = "instance"
-    tags          = module.this.tags
+  dynamic "tag_specifications" {
+    for_each = var.tag_specifications_resource_types
+
+    content {
+      resource_type = tag_specifications.value
+      tags          = module.this.tags
+    }
   }
 
   tags = module.this.tags
@@ -153,6 +158,24 @@ resource "aws_autoscaling_group" "default" {
   wait_for_capacity_timeout = var.wait_for_capacity_timeout
   protect_from_scale_in     = var.protect_from_scale_in
   service_linked_role_arn   = var.service_linked_role_arn
+  desired_capacity          = var.desired_capacity
+  max_instance_lifetime     = var.max_instance_lifetime
+
+  dynamic "instance_refresh" {
+    for_each = (var.instance_refresh != null ? [var.instance_refresh] : [])
+
+    content {
+      strategy = instance_refresh.value.strategy
+      dynamic "preferences" {
+        for_each = (length(instance_refresh.value.preferences) > 0 ? [instance_refresh.value.preferences] : [])
+        content {
+          instance_warmup        = lookup(preferences.value, "instance_warmup", null)
+          min_healthy_percentage = lookup(preferences.value, "min_healthy_percentage", null)
+        }
+      }
+      triggers = instance_refresh.value.triggers
+    }
+  }
 
   dynamic "launch_template" {
     for_each = (local.launch_template != null ?
@@ -214,5 +237,6 @@ resource "aws_autoscaling_group" "default" {
 
   lifecycle {
     create_before_destroy = true
+    ignore_changes        = [desired_capacity]
   }
 }

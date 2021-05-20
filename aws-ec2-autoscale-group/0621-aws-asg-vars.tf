@@ -1,3 +1,4 @@
+
 variable "image_id" {
   type        = string
   description = "The EC2 image ID to launch"
@@ -101,7 +102,21 @@ variable "instance_market_options" {
   default = null
 }
 
-variable mixed_instances_policy {
+variable "instance_refresh" {
+  description = "The instance refresh definition"
+  type = object({
+    strategy = string
+    preferences = object({
+      instance_warmup        = number
+      min_healthy_percentage = number
+    })
+    triggers = list(string)
+  })
+
+  default = null
+}
+
+variable "mixed_instances_policy" {
   description = "policy to used mixed group of on demand/spot of differing types. Launch template is automatically generated. https://www.terraform.io/docs/providers/aws/r/autoscaling_group.html#mixed_instances_policy-1"
 
   type = object({
@@ -309,7 +324,7 @@ variable "scale_up_adjustment_type" {
 variable "scale_up_policy_type" {
   type        = string
   default     = "SimpleScaling"
-  description = "The scalling policy type, either `SimpleScaling`, `StepScaling` or `TargetTrackingScaling`"
+  description = "The scaling policy type. Currently only `SimpleScaling` is supported"
 }
 
 variable "scale_down_cooldown_seconds" {
@@ -333,7 +348,7 @@ variable "scale_down_adjustment_type" {
 variable "scale_down_policy_type" {
   type        = string
   default     = "SimpleScaling"
-  description = "The scalling policy type, either `SimpleScaling`, `StepScaling` or `TargetTrackingScaling`"
+  description = "The scaling policy type. Currently only `SimpleScaling` is supported"
 }
 
 variable "cpu_utilization_high_evaluation_periods" {
@@ -384,6 +399,12 @@ variable "cpu_utilization_low_statistic" {
   description = "The statistic to apply to the alarm's associated metric. Either of the following is supported: `SampleCount`, `Average`, `Sum`, `Minimum`, `Maximum`"
 }
 
+variable "desired_capacity" {
+  type        = number
+  description = "The number of Amazon EC2 instances that should be running in the group, if not set will use `min_size` as value"
+  default     = null
+}
+
 variable "default_alarms_enabled" {
   type        = bool
   default     = true
@@ -410,4 +431,37 @@ variable "custom_alarms" {
   }))
   default     = {}
   description = "Map of custom CloudWatch alarms configurations"
+}
+
+variable "metadata_http_endpoint_enabled" {
+  type        = bool
+  default     = true
+  description = "Set false to disable the Instance Metadata Service."
+}
+
+variable "metadata_http_put_response_hop_limit" {
+  type        = number
+  default     = 2
+  description = <<-EOT
+    The desired HTTP PUT response hop limit (between 1 and 64) for Instance Metadata Service requests.
+    The default is `2` to support containerized workloads.
+    EOT
+}
+
+variable "metadata_http_tokens_required" {
+  type        = bool
+  default     = true
+  description = "Set true to require IMDS session tokens, disabling Instance Metadata Service Version 1."
+}
+
+variable "tag_specifications_resource_types" {
+  type        = set(string)
+  default     = ["instance", "volume"]
+  description = "List of tag specification resource types to tag. Valid values are instance, volume, elastic-gpu and spot-instances-request."
+}
+
+variable "max_instance_lifetime" {
+  type        = number
+  default     = null
+  description = "The maximum amount of time, in seconds, that an instance can be in service, values must be either equal to 0 or between 604800 and 31536000 seconds"
 }
