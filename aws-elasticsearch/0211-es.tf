@@ -1,5 +1,6 @@
 module "user_label" {
-  source  = "git::https://github.com/matkovskiy/tf-modules.git//aws-null-label?ref=tags/0.0.25"
+  source  = "cloudposse/label/null"
+  version = "0.24.1"
 
   attributes = ["user"]
 
@@ -7,7 +8,8 @@ module "user_label" {
 }
 
 module "kibana_label" {
-  source  = "git::https://github.com/matkovskiy/tf-modules.git//aws-null-label?ref=tags/0.0.25"
+  source  = "cloudposse/label/null"
+  version = "0.24.1"
 
   attributes = ["kibana"]
 
@@ -125,8 +127,11 @@ resource "aws_elasticsearch_domain" "default" {
   }
 
   domain_endpoint_options {
-    enforce_https       = var.domain_endpoint_options_enforce_https
-    tls_security_policy = var.domain_endpoint_options_tls_security_policy
+    enforce_https                   = var.domain_endpoint_options_enforce_https
+    tls_security_policy             = var.domain_endpoint_options_tls_security_policy
+    custom_endpoint_enabled         = var.custom_endpoint_enabled
+    custom_endpoint                 = var.custom_endpoint_enabled ? var.custom_endpoint : null
+    custom_endpoint_certificate_arn = var.custom_endpoint_enabled ? var.custom_endpoint_certificate_arn : null
   }
 
   cluster_config {
@@ -259,7 +264,8 @@ resource "aws_elasticsearch_domain_policy" "default" {
 }
 
 module "domain_hostname" {
-  source  = "git::https://github.com/matkovskiy/tf-modules.git//aws-route53-cluster-hostname?ref=tags/0.0.29"
+  source  = "cloudposse/route53-cluster-hostname/aws"
+  version = "0.12.0"
 
   enabled  = module.this.enabled && var.domain_hostname_enabled
   dns_name = var.elasticsearch_subdomain_name == "" ? module.this.id : var.elasticsearch_subdomain_name
@@ -271,7 +277,8 @@ module "domain_hostname" {
 }
 
 module "kibana_hostname" {
-  source  = "git::https://github.com/matkovskiy/tf-modules.git//aws-route53-cluster-hostname?ref=tags/0.0.29"
+  source  = "cloudposse/route53-cluster-hostname/aws"
+  version = "0.12.0"
 
   enabled  = module.this.enabled && var.kibana_hostname_enabled
   dns_name = var.kibana_subdomain_name == "" ? module.kibana_label.id : var.kibana_subdomain_name
