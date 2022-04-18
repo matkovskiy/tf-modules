@@ -51,6 +51,11 @@ variable "service_name" {
   default     = ""
 }
 
+variable "launch_type" {
+  description = "(Optional) Launch type on which to run your service. The valid values are EC2, FARGATE, and EXTERNAL. Defaults to EC2"
+  type        = string
+}
+
 variable "cluster_id" {
   description = "ID of ECS cluster "
   type        = string
@@ -112,13 +117,25 @@ variable "ecs_service_registries" {
   default     = []
 }
 
+variable "network_mode" {
+  type        = string
+  description = "The network mode to use for the task. This is required to be `awsvpc` for `FARGATE` `launch_type` or `null` for `EC2` `launch_type`"
+  default     = "awsvpc"
+}
 
-variable "network_configuration" {
-  type = list(object({
-    subnets   = string
-    security_groups = string
-    assign_public_ip = bool
-  }))
-  description = "Task Networking with the awsvpc Network Mode"
+variable "assign_public_ip" {
+  type        = bool
+  description = "Assign a public IP address to the ENI (Fargate launch type only). Valid values are `true` or `false`. Default `false`"
+  default     = false
+}
+variable "subnet_ids" {
+  type        = list(string)
+  description = "Subnet IDs used in Service `network_configuration` if `var.network_mode = \"awsvpc\"`"
+  default     = null
+}
+
+variable "security_groups" {
+  type        = list(string)
+  description = "A list of Security Group IDs to allow in Service `network_configuration` if `var.network_mode = \"awsvpc\"`"
   default     = []
 }

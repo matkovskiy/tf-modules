@@ -6,6 +6,7 @@ resource "aws_ecs_service" "main" {
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
   deployment_maximum_percent         = var.deployment_maximum_percent
   iam_role                           = var.iam_role != "" ? var.iam_role : null
+  launch_type =var.launch_type
 
   dynamic "service_registries" {
     for_each = var.ecs_service_registries
@@ -29,11 +30,11 @@ resource "aws_ecs_service" "main" {
   }
 
   dynamic "network_configuration" {
-    for_each = var.network_configuration
+    for_each = var.network_mode == "awsvpc" ? ["true"] : []
     content {
-      subnets     = [lookup(network_configuration.value, "subnets", null)]
-      security_groups  = [lookup(network_configuration.value, "security_groups", null)]
-      assign_public_ip   = lookup(network_configuration.value, "assign_public_ip", null)
+      security_groups  = var.security_groups
+      subnets          = var.subnet_ids
+      assign_public_ip = var.assign_public_ip
     }
   }
 

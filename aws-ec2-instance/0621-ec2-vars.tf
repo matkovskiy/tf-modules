@@ -1,6 +1,7 @@
 variable "ssh_key_pair" {
   type        = string
   description = "SSH key pair to be provisioned on the instance"
+  default     = null
 }
 
 variable "associate_public_ip_address" {
@@ -33,15 +34,39 @@ variable "instance_type" {
   default     = "t2.micro"
 }
 
+variable "burstable_mode" {
+  type        = string
+  description = "Enable burstable mode for the instance. Can be standard or unlimited. Applicable only for T2/T3/T4g instance types."
+  default     = null
+}
+
 variable "vpc_id" {
   type        = string
   description = "The ID of the VPC that the instance security group belongs to"
 }
 
+variable "security_group_enabled" {
+  type        = bool
+  description = "Whether to create default Security Group for EC2."
+  default     = true
+}
+
 variable "security_groups" {
-  description = "List of Security Group IDs allowed to connect to the instance"
+  description = "A list of Security Group IDs to associate with EC2 instance."
   type        = list(string)
   default     = []
+}
+
+variable "security_group_description" {
+  type        = string
+  default     = "EC2 Security Group"
+  description = "The Security Group description."
+}
+
+variable "security_group_use_name_prefix" {
+  type        = bool
+  default     = false
+  description = "Whether to create a default Security Group with unique name beginning with the normalized prefix."
 }
 
 variable "security_group_rules" {
@@ -53,6 +78,7 @@ variable "security_group_rules" {
       to_port     = 65535
       protocol    = "-1"
       cidr_blocks = ["0.0.0.0/0"]
+      description = "Allow all outbound traffic"
     }
   ]
   description = <<-EOT
@@ -87,7 +113,7 @@ variable "ami" {
 
 variable "ami_owner" {
   type        = string
-  description = "Owner of the given AMI (ignored if `ami` unset)"
+  description = "Owner of the given AMI (ignored if `ami` unset, required if set)"
   default     = ""
 }
 
@@ -112,7 +138,7 @@ variable "monitoring" {
 variable "private_ip" {
   type        = string
   description = "Private IP address to associate with the instance in the VPC"
-  default     = ""
+  default     = null
 }
 
 variable "source_dest_check" {
@@ -159,19 +185,19 @@ variable "ebs_device_name" {
 
 variable "ebs_volume_type" {
   type        = string
-  description = "The type of EBS volume. Can be standard, gp2 or io1"
+  description = "The type of the additional EBS volumes. Can be standard, gp2 or io1"
   default     = "gp2"
 }
 
 variable "ebs_volume_size" {
   type        = number
-  description = "Size of the EBS volume in gigabytes"
+  description = "Size of the additional EBS volumes in gigabytes"
   default     = 10
 }
 
 variable "ebs_volume_encrypted" {
   type        = bool
-  description = "Size of the EBS volume in gigabytes"
+  description = "Whether to encrypt the additional EBS volumes"
   default     = true
 }
 
@@ -241,12 +267,6 @@ variable "default_alarm_action" {
   description = "Default alarm action"
 }
 
-variable "create_default_security_group" {
-  type        = bool
-  description = "Create default Security Group with only Egress traffic allowed"
-  default     = true
-}
-
 variable "additional_ips_count" {
   type        = number
   description = "Count of additional EIPs"
@@ -263,6 +283,12 @@ variable "instance_profile" {
   type        = string
   description = "A pre-defined profile to attach to the instance (default is to build our own)"
   default     = ""
+}
+
+variable "instance_initiated_shutdown_behavior" {
+  type        = string
+  description = "Specifies whether an instance stops or terminates when you initiate shutdown from the instance. Can be one of 'stop' or 'terminate'."
+  default     = null
 }
 
 variable "root_block_device_encrypted" {
@@ -299,4 +325,22 @@ variable "volume_tags_enabled" {
   type        = bool
   default     = true
   description = "Whether or not to copy instance tags to root and EBS volumes"
+}
+
+variable "ssm_patch_manager_enabled" {
+  type        = bool
+  default     = false
+  description = "Whether to enable SSM Patch manager"
+}
+
+variable "ssm_patch_manager_iam_policy_arn" {
+  type        = string
+  default     = null
+  description = "IAM policy ARN to allow Patch Manager to manage the instance. If not provided, `arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore` will be used"
+}
+
+variable "ssm_patch_manager_s3_log_bucket" {
+  type        = string
+  default     = null
+  description = "The name of the s3 bucket to export the patch log to"
 }

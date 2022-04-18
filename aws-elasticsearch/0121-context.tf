@@ -8,6 +8,8 @@
 # Cloud Posse's standard configuration inputs suitable for passing
 # to Cloud Posse modules.
 #
+# curl -sL https://raw.githubusercontent.com/cloudposse/terraform-null-label/master/exports/context.tf -o context.tf
+#
 # Modules should access the whole context as `module.this.context`
 # to get the input variables with nulls for defaults,
 # for example `context = module.this.context`,
@@ -19,7 +21,8 @@
 #
 
 module "this" {
-  source = "/Users/amatkovskiy/Work/amatkovskiy/tf-modules/tf-null-label/"
+  source = "git::https://github.com/matkovskiy/tf-modules.git//aws-null-label?ref=tags/0.0.42"
+  # version = "0.25.0" # requires Terraform >= 0.13.0
 
   enabled             = var.enabled
   namespace           = var.namespace
@@ -41,7 +44,6 @@ module "this" {
 
   context = var.context
 }
-
 
 # Copy contents of cloudposse/terraform-null-label/variables.tf here
 

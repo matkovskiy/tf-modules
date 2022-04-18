@@ -88,6 +88,12 @@ variable "iam_role_arns" {
   description = "List of IAM role ARNs to permit access to the Elasticsearch domain"
 }
 
+variable "iam_role_permissions_boundary" {
+  type        = string
+  default     = null
+  description = "The ARN of the permissions boundary policy which will be attached to the Elasticsearch user role"
+}
+
 variable "iam_authorizing_role_arns" {
   type        = list(string)
   default     = []
@@ -110,6 +116,11 @@ variable "availability_zone_count" {
   type        = number
   default     = 2
   description = "Number of Availability Zones for the domain to use."
+
+  validation {
+    condition     = contains([2, 3], var.availability_zone_count)
+    error_message = "The availibility zone count must be 2 or 3."
+  }
 }
 
 variable "ebs_volume_size" {
