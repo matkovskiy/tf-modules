@@ -1,8 +1,8 @@
 module "role" {
-  
-  source  = "git::https://github.com/matkovskiy/tf-modules.git//aws-iam-role?ref=tags/0.0.37"
 
-  
+  source = "git::https://github.com/matkovskiy/tf-modules.git//aws-iam-role?ref=tags/0.0.37"
+
+
   attributes = compact(concat(module.this.attributes, tolist(["log"]), tolist(["group"])))
 
   role_description   = "Cloudwatch ${module.this.id} logs role"

@@ -7,7 +7,7 @@ locals {
 }
 
 module "label" {
-  source = "git::https://github.com/matkovskiy/tf-modules.git//aws-null-label?ref=tags/0.0.25"
+  source  = "git::https://github.com/matkovskiy/tf-modules.git//aws-null-label?ref=tags/0.0.25"
   context = module.this.context
 }
 

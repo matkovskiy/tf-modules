@@ -305,7 +305,7 @@ resource "aws_s3_bucket_object_lock_configuration" "default" {
 }
 
 module "s3_user" {
-  source  = "git::https://github.com/matkovskiy/tf-modules.git//aws-iam-s3-user?ref=tags/0.0.34"
+  source = "git::https://github.com/matkovskiy/tf-modules.git//aws-iam-s3-user?ref=tags/0.0.34"
   #version = "0.15.7"
 
   enabled      = local.enabled && var.user_enabled

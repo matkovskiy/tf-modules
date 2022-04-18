@@ -21,7 +21,7 @@
 #
 
 module "this" {
-source  = "git::https://github.com/matkovskiy/tf-modules.git//tf-null-label?ref=tags/0.0.40"
+  source = "git::https://github.com/matkovskiy/tf-modules.git//tf-null-label?ref=tags/0.0.40"
   # version = "0.25.0" # requires Terraform >= 0.13.0
 
   enabled             = var.enabled

@@ -110,7 +110,7 @@ resource "aws_dynamodb_table" "default" {
 }
 
 module "dynamodb_autoscaler" {
-  source  = "git::https://github.com/matkovskiy/tf-modules.git//aws-dynamodb-autoscaler?ref=tags/0.0.37"
+  source = "git::https://github.com/matkovskiy/tf-modules.git//aws-dynamodb-autoscaler?ref=tags/0.0.37"
 
   enabled = local.enabled && var.enable_autoscaler && var.billing_mode == "PROVISIONED"
 

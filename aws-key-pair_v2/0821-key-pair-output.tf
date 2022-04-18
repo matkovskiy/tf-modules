@@ -1,6 +1,6 @@
 output "id" {
   value = [
-    for k in aws_key_pair.default :  k.id
+    for k in aws_key_pair.default : k.id
   ]
   description = "The key pair name."
 }

@@ -83,7 +83,7 @@ resource "aws_iam_user_group_membership" "ses_user" {
 
 
 module "ses_user" {
-  source  = "git::https://github.com/matkovskiy/tf-modules.git//aws-iam-system-user?ref=tags/0.0.39"
+  source = "git::https://github.com/matkovskiy/tf-modules.git//aws-iam-system-user?ref=tags/0.0.39"
 
   enabled = local.create_user_enabled
 
@@ -93,7 +93,7 @@ module "ses_user" {
 
 resource "aws_iam_user_policy" "sending_emails" {
   #bridgecrew:skip=BC_AWS_IAM_16:Skipping `Ensure IAM policies are attached only to groups or roles` check because this module intentionally attaches IAM policy directly to a user.
-  count = local.create_user_enabled && ! local.create_group_enabled ? 1 : 0
+  count = local.create_user_enabled && !local.create_group_enabled ? 1 : 0
 
   name   = module.this.id
   policy = join("", data.aws_iam_policy_document.ses_policy.*.json)

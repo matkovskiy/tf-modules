@@ -2,7 +2,7 @@
 
 module "ssh_access" {
   count  = local.need_ssh_access_sg ? 1 : 0
-  source  = "git::https://github.com/matkovskiy/tf-modules.git//aws-security-group/?ref=tags/0.0.42" 
+  source = "git::https://github.com/matkovskiy/tf-modules.git//aws-security-group/?ref=tags/0.0.42"
 
 
   attributes = ["ssh"]

@@ -19,7 +19,7 @@
 #
 
 module "this" {
-  source  = "git::https://github.com/matkovskiy/tf-modules.git//tf-null-label?ref=tags/0.0.42"
+  source = "git::https://github.com/matkovskiy/tf-modules.git//tf-null-label?ref=tags/0.0.42"
 
   enabled             = var.enabled
   namespace           = var.namespace

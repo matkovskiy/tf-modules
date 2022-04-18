@@ -108,7 +108,7 @@ variable "ecs_load_balancers" {
 
 variable "ecs_service_registries" {
   type = list(object({
-    registry_arn   = string
+    registry_arn = string
     # port           = number
     container_port = number
     container_name = string

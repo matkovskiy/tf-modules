@@ -23,7 +23,7 @@ resource "aws_iam_role_policy_attachment" "default" {
 }
 
 resource "aws_iam_instance_profile" "default" {
-  count  = var.instance_profile_enable ? 1 : 0
-  name = var.role_name
-  role = aws_iam_role.default.name
+  count = var.instance_profile_enable ? 1 : 0
+  name  = var.role_name
+  role  = aws_iam_role.default.name
 }

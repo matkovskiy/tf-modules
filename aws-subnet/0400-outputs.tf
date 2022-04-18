@@ -40,21 +40,21 @@ output "az_subnet_arns" {
 }
 
 output "rt-public_subnet_id" {
-  value = aws_route_table.public.*.id
+  value       = aws_route_table.public.*.id
   description = "ID of route table for public sbunet"
 }
 
 output "rt_private_subnet_id" {
-  value = aws_route_table.private.*.id
+  value       = aws_route_table.private.*.id
   description = "ID of route table for private sbunet"
 }
 
 output "acl-public_subnet_id" {
-  value = aws_network_acl.public.*.id
+  value       = aws_network_acl.public.*.id
   description = "ID of ACL for public subnet"
 }
 
 output "acl-private_subnet_id" {
-  value = aws_network_acl.private.*.id
+  value       = aws_network_acl.private.*.id
   description = "ID of ACL for private subnet"
 }
