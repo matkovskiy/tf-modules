@@ -1,49 +1,4 @@
-variable "enabled" {
-  type        = bool
-  description = "Set to false to prevent the module from creating any resources"
-  default     = true
-}
 
-variable "namespace" {
-  type        = string
-  description = "Namespace (e.g. `eg` or `cp`)"
-  default     = ""
-}
-
-variable "stage" {
-  type        = string
-  description = "Stage (e.g. `prod`, `dev`, `staging`)"
-  default     = ""
-}
-
-variable "name" {
-  type        = string
-  description = "Name of the application"
-}
-
-variable "use_existing_security_groups" {
-  type        = bool
-  description = "Flag to enable/disable creation of Security Group in the module. Set to `true` to disable Security Group creation and provide a list of existing security Group IDs in `existing_security_groups` to place the cluster into"
-  default     = false
-}
-
-variable "existing_security_groups" {
-  type        = list(string)
-  default     = []
-  description = "List of existing Security Group IDs to place the cluster into. Set `use_existing_security_groups` to `true` to enable using `existing_security_groups` as Security Groups for the cluster"
-}
-
-variable "allowed_security_groups" {
-  type        = list(string)
-  default     = []
-  description = "List of Security Group IDs that are allowed ingress to the cluster's Security Group created in the module"
-}
-
-variable "allowed_cidr_blocks" {
-  type        = list(string)
-  default     = []
-  description = "List of CIDR blocks that are allowed ingress to the cluster's Security Group created in the module"
-}
 
 variable "vpc_id" {
   type        = string
@@ -116,7 +71,10 @@ variable "at_rest_encryption_enabled" {
 variable "transit_encryption_enabled" {
   type        = bool
   default     = true
-  description = "Enable TLS"
+  description = <<-EOT
+    Set `true` to enable encryption in transit. Forced `true` if `var.auth_token` is set.
+    If this is enabled, use the [following guide](https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/in-transit-encryption.html#connect-tls) to access redis.
+    EOT
 }
 
 variable "notification_topic_arn" {
@@ -162,6 +120,12 @@ variable "automatic_failover_enabled" {
   description = "Automatic failover (Not available for T1/T2 instances)"
 }
 
+variable "multi_az_enabled" {
+  type        = bool
+  default     = false
+  description = "Multi AZ (Automatic Failover must also be enabled.  If Cluster Mode is enabled, Multi AZ is on by default, and this setting is ignored)"
+}
+
 variable "availability_zones" {
   type        = list(string)
   description = "Availability zone IDs"
@@ -169,9 +133,13 @@ variable "availability_zones" {
 }
 
 variable "zone_id" {
-  type        = string
-  default     = ""
-  description = "Route53 DNS Zone ID"
+  type        = any
+  default     = []
+  description = <<-EOT
+    Route53 DNS Zone ID as list of string (0 or 1 items). If empty, no custom DNS name will be published.
+    If the list contains a single Zone ID, a custom DNS name will be pulished in that zone.
+    Can also be a plain string, but that use is DEPRECATED because of Terraform issues.
+    EOT
 }
 
 variable "dns_subdomain" {
@@ -180,27 +148,15 @@ variable "dns_subdomain" {
   description = "The subdomain to use for the CNAME record. If not provided then the CNAME record will use var.name."
 }
 
-variable "delimiter" {
-  type        = string
-  default     = "-"
-  description = "Delimiter between `name`, `namespace`, `stage` and `attributes`"
-}
-
-variable "attributes" {
-  type        = list(string)
-  description = "Additional attributes (_e.g._ \"1\")"
-  default     = []
-}
-
-variable "tags" {
-  type        = map(string)
-  description = "Additional tags (_e.g._ map(\"BusinessUnit\",\"ABC\")"
-  default     = {}
-}
-
 variable "auth_token" {
   type        = string
   description = "Auth token for password protecting redis, `transit_encryption_enabled` must be set to `true`. Password must be longer than 16 chars"
+  default     = null
+}
+
+variable "kms_key_id" {
+  type        = string
+  description = "The ARN of the key that you wish to use if encrypting at rest. If not supplied, uses service managed encryption. `at_rest_encryption_enabled` must be set to `true`"
   default     = null
 }
 
@@ -208,6 +164,19 @@ variable "replication_group_id" {
   type        = string
   description = "Replication group ID with the following constraints: \nA name must contain from 1 to 20 alphanumeric characters or hyphens. \n The first character must be a letter. \n A name cannot end with a hyphen or contain two consecutive hyphens."
   default     = ""
+}
+
+variable "snapshot_arns" {
+  type        = list(string)
+  description = "A single-element string list containing an Amazon Resource Name (ARN) of a Redis RDB snapshot file stored in Amazon S3. Example: arn:aws:s3:::my_bucket/snapshot1.rdb"
+  default     = []
+}
+
+
+variable "snapshot_name" {
+  type        = string
+  description = "The name of a snapshot from which to restore data into the new node group. Changing the snapshot_name forces a new resource."
+  default     = null
 }
 
 variable "snapshot_window" {
@@ -220,6 +189,12 @@ variable "snapshot_retention_limit" {
   type        = number
   description = "The number of days for which ElastiCache will retain automatic cache cluster snapshots before deleting them."
   default     = 0
+}
+
+variable "final_snapshot_identifier" {
+  type        = string
+  description = "The name of your final node group (shard) snapshot. ElastiCache creates the snapshot from the primary node in the cluster. If omitted, no final snapshot will be made."
+  default     = null
 }
 
 variable "cluster_mode_enabled" {
@@ -238,4 +213,16 @@ variable "cluster_mode_num_node_groups" {
   type        = number
   description = "Number of node groups (shards) for this Redis replication group. Changing this number will trigger an online resizing operation before other settings modifications"
   default     = 0
+}
+
+variable "cloudwatch_metric_alarms_enabled" {
+  type        = bool
+  description = "Boolean flag to enable/disable CloudWatch metrics alarms"
+  default     = false
+}
+
+variable "parameter_group_description" {
+  type        = string
+  default     = null
+  description = "Managed by Terraform"
 }
