@@ -1,7 +1,11 @@
 variable "use_fullname" {
   type        = bool
   default     = true
-  description = "Set 'true' to use `namespace-stage-name` for ecr repository name, else `name`"
+  description = <<-EOT
+  If set to 'true' then the full ID for the IAM role name (e.g. `[var.namespace]-[var.environment]-[var.stage]`) will be used.
+
+  Otherwise, `var.name` will be used for the IAM role name.
+  EOT
 }
 
 variable "principals" {
@@ -22,10 +26,22 @@ variable "policy_document_count" {
   default     = 1
 }
 
+variable "managed_policy_arns" {
+  type        = set(string)
+  description = "List of managed policies to attach to created role"
+  default     = []
+}
+
 variable "max_session_duration" {
   type        = number
   default     = 3600
   description = "The maximum session duration (in seconds) for the role. Can have a value from 1 hour to 12 hours"
+}
+
+variable "permissions_boundary" {
+  type        = string
+  default     = ""
+  description = "ARN of the policy that is used to set the permissions boundary for the role"
 }
 
 variable "role_description" {
@@ -35,11 +51,40 @@ variable "role_description" {
 
 variable "policy_description" {
   type        = string
+  default     = ""
   description = "The description of the IAM policy that is visible in the IAM policy manager"
 }
 
-variable "assume_role_action" {
-  type        = string
-  default     = "sts:AssumeRole"
+variable "assume_role_actions" {
+  type        = list(string)
+  default     = ["sts:AssumeRole", "sts:TagSession"]
   description = "The IAM action to be granted by the AssumeRole policy"
+}
+
+variable "assume_role_conditions" {
+  type = list(object({
+    test     = string
+    variable = string
+    values   = list(string)
+  }))
+  description = "List of conditions for the assume role policy"
+  default     = []
+}
+
+variable "instance_profile_enabled" {
+  type        = bool
+  default     = false
+  description = "Create EC2 Instance Profile for the role"
+}
+
+variable "path" {
+  type        = string
+  description = "Path to the role and policy. See [IAM Identifiers](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html) for more information."
+  default     = "/"
+}
+
+variable "tags_enabled" {
+  type        = string
+  description = "Enable/disable tags on IAM roles and policies"
+  default     = true
 }
