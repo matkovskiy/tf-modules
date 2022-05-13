@@ -1,87 +1,90 @@
-resource "aws_s3_bucket" "default" {
-  #bridgecrew:skip=BC_AWS_S3_13:Skipping `Enable S3 Bucket Logging` check until bridgecrew will support dynamic blocks (https://github.com/bridgecrewio/checkov/issues/776).
-  #bridgecrew:skip=CKV_AWS_52:Skipping `Ensure S3 bucket has MFA delete enabled` due to issue in terraform (https://github.com/hashicorp/terraform-provider-aws/issues/629).
-  count         = module.this.enabled ? 1 : 0
-  bucket        = module.this.id
-  acl           = var.acl
-  force_destroy = var.force_destroy
-  policy        = var.policy
 
-  versioning {
-    enabled = var.versioning_enabled
-  }
+# Terraform prior to 1.1 does not support a `moved` block.
+# Terraform 1.1 supports `moved` blocks in general, but does not a support
+# a move to an object declared in external module package.
+# Leaving this here for documentation and in case Terraform later supports it.
+/*
+moved {
+  from = aws_s3_bucket.default
+  to   = module.aws_s3_bucket.aws_s3_bucket.default
+}
+moved {
+  from = aws_s3_bucket_policy.default
+  to   = module.aws_s3_bucket.aws_s3_bucket_policy.default
+}
+moved {
+  from = aws_s3_bucket_ownership_controls.default
+  to   = module.aws_s3_bucket.aws_s3_bucket_ownership_controls.default
+}
+moved {
+  from = aws_s3_bucket_public_access_block.default
+  to   = module.aws_s3_bucket.aws_s3_bucket_public_access_block.default
+}
+*/
 
-  lifecycle_rule {
-    id                                     = module.this.id
-    enabled                                = var.lifecycle_rule_enabled
-    prefix                                 = var.lifecycle_prefix
-    tags                                   = var.lifecycle_tags
-    abort_incomplete_multipart_upload_days = var.abort_incomplete_multipart_upload_days
+locals {
+  # This is a big hack to enable us to generate something close to a custom error message
+  force_destroy_error_message = <<-EOT
 
-    noncurrent_version_expiration {
-      days = var.noncurrent_version_expiration_days
-    }
+    ** ERROR: You must set `force_destroy_enabled = true` to enable `force_destroy`. **n/
+    ** WARNING: Upgrading this module from a version prior to 0.27.0 to this version **n/
+    **  will cause Terraform to delete your existing S3 bucket CAUSING COMPLETE DATA LOSS **n/
+    **  unless you follow the upgrade instructions on the Wiki [here](https://github.com/cloudposse/terraform-aws-s3-log-storage/wiki/Upgrading-to-v0.27.0-(POTENTIAL-DATA-LOSS)). **n/
+    **  See additional instructions for upgrading from v0.27.0 to v0.28.0 [here](https://github.com/cloudposse/terraform-aws-s3-log-storage/wiki/Upgrading-to-v0.28.0-and-AWS-provider-v4-(POTENTIAL-DATA-LOSS)). **n/
 
-    dynamic "noncurrent_version_transition" {
-      for_each = var.enable_glacier_transition ? [1] : []
-
-      content {
-        days          = var.noncurrent_version_transition_days
-        storage_class = "GLACIER"
-      }
-    }
-
-    transition {
-      days          = var.standard_transition_days
-      storage_class = "STANDARD_IA"
-    }
-
-    dynamic "transition" {
-      for_each = var.enable_glacier_transition ? [1] : []
-
-      content {
-        days          = var.glacier_transition_days
-        storage_class = "GLACIER"
-      }
-    }
-
-    expiration {
-      days = var.expiration_days
-    }
-
-  }
-
-  dynamic "logging" {
-    for_each = var.access_log_bucket_name != "" ? [1] : []
-    content {
-      target_bucket = var.access_log_bucket_name
-      target_prefix = "logs/${module.this.id}/"
+    EOT
+  force_destroy_safety = {
+    true = {
+      true  = "true"
+      false = "false"
+    },
+    false = {
+      true  = local.force_destroy_error_message
+      false = "false"
     }
   }
+  # Generate an error message when `force_destroy == true && force_destroy_enabled == false`
+  force_destroy = tobool(local.force_destroy_safety[var.force_destroy_enabled][var.force_destroy])
 
-  # https://docs.aws.amazon.com/AmazonS3/latest/dev/bucket-encryption.html
-  # https://www.terraform.io/docs/providers/aws/r/s3_bucket.html#enable-default-server-side-encryption
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm     = var.sse_algorithm
-        kms_master_key_id = var.kms_master_key_arn
-      }
-    }
-  }
-
-  tags = module.this.tags
+  bucket_name = var.bucket_name == null || var.bucket_name == "" ? module.this.id : var.bucket_name
 }
 
-# Refer to the terraform documentation on s3_bucket_public_access_block at
-# https://www.terraform.io/docs/providers/aws/r/s3_bucket_public_access_block.html
-# for the nuances of the blocking options
-resource "aws_s3_bucket_public_access_block" "default" {
-  count  = module.this.enabled ? 1 : 0
-  bucket = join("", aws_s3_bucket.default.*.id)
+module "aws_s3_bucket" {
+  source = "git::https://github.com/matkovskiy/tf-modules.git//aws-s3-bucket?ref=tags/0.0.45"
+  # version = "0.49.0"
+
+  bucket_name        = local.bucket_name
+  acl                = var.acl
+  force_destroy      = local.force_destroy
+  versioning_enabled = var.versioning_enabled
+
+  source_policy_documents = var.source_policy_documents
+  # Support deprecated `policy` input
+  policy = var.policy
+
+  lifecycle_configuration_rules = var.lifecycle_configuration_rules
+  # Support deprecated lifecycle inputs
+  lifecycle_rule_ids = local.deprecated_lifecycle_rule.enabled ? [module.this.id] : null
+  lifecycle_rules    = local.deprecated_lifecycle_rule.enabled ? [local.deprecated_lifecycle_rule] : null
+
+  logging = var.access_log_bucket_name == "" ? null : {
+    bucket_name = var.access_log_bucket_name
+    prefix      = "${var.access_log_bucket_prefix}${local.bucket_name}/"
+  }
+
+  sse_algorithm      = var.sse_algorithm
+  kms_master_key_arn = var.kms_master_key_arn
+  bucket_key_enabled = var.bucket_key_enabled
+
+  allow_encrypted_uploads_only = var.allow_encrypted_uploads_only
+  allow_ssl_requests_only      = var.allow_ssl_requests_only
 
   block_public_acls       = var.block_public_acls
   block_public_policy     = var.block_public_policy
   ignore_public_acls      = var.ignore_public_acls
   restrict_public_buckets = var.restrict_public_buckets
+
+  s3_object_ownership = var.s3_object_ownership
+
+  context = module.this.context
 }
