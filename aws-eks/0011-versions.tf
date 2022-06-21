@@ -1,4 +1,4 @@
-# 0.45.0
+# 0.46.0
 terraform {
   required_version = ">= 0.14.0"
 
